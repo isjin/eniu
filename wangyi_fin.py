@@ -26,7 +26,7 @@ class Financial(object):
         return codes
 
     def iterator_stock_code(self):
-        codes = self.get_stock_codes()
+        codes = self.get_stock_codes()[:]
         for code in codes:
             yield code
 
