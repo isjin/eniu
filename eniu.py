@@ -38,14 +38,20 @@ class ENiu(object):
             code = 'sz%s' % code
         stock_url = 'https://eniu.com/gu/%s' % code
         soup = self.urlparser.soup_request(stock_url, headers=self.headers)
+        # print(soup)
         html = soup.find_all('div', class_='col-xs-12')
+        # print(html)
+        # print(len(html))
         if len(html) == 0:
             print("No page")
         else:
-            if len(html) == 10:
-                html_pe = html[2]
+            if len(html) == 11:
+                # html_pe = html[2]
+                html_pe = html[6]
             else:
-                html_pe = html[3]
+                # html_pe = html[3]
+                html_pe = html[7]
+            # print(html_pe)
             html_fundamentals = html[0]
             soup_fundamentals = self.urlparser.lxml_html(html_fundamentals)
             fundamentals_info = soup_fundamentals.find_all('a')
@@ -64,15 +70,17 @@ class ENiu(object):
             stock_mv = fundamentals_info[7].string
             stock_info_pe['j2'] = stock_mv
             soup_pe = self.urlparser.lxml_html(html_pe)
+            # print(soup_pe)
             pe_info = soup_pe.find_all('h3')
+            # print(pe_info)
             # pe_now = pe_info[2].string
             pe_now = stock_pe
             stock_info_pe['b4'] = pe_now
-            pe_avg = pe_info[3].string
+            pe_avg = pe_info[2].string
             stock_info_pe['d4'] = pe_avg
-            pe_high = pe_info[4].string
+            pe_high = pe_info[3].string
             stock_info_pe['f4'] = pe_high
-            pe_low = pe_info[5].string
+            pe_low = pe_info[4].string
             stock_info_pe['h4'] = pe_low
             pe_his_avg = []
             pe_his_high = []
@@ -105,6 +113,8 @@ class ENiu(object):
                 col_pe_history_low = 'd' + str(7 + num_1)
                 stock_info_pe[col_pe_history_low] = float(pe_history_low)
 
+            # print(len(html_pe_history))
+            # print(html_pe_history)
             if len(html_pe_history) > 40:
                 html_pe_history = html_pe_history[:40]
                 for i in range(0, 10):
@@ -124,11 +134,12 @@ class ENiu(object):
                 stock_info_pe[row_high] = self.avg(pe_his_high)
                 stock_info_pe[row_low] = self.avg(pe_his_low)
                 line_number = 17 - 10 + number
-            soup_corp = self.urlparser.lxml_html(html_pe)
+            soup_corp = self.urlparser.lxml_html(html[-1])
+            # print(soup_corp)
             corp_info = soup_corp.find_all('a')
-            corp_industry = corp_info[1].string
+            corp_industry = corp_info[0].string
             stock_info_pe['d1'] = corp_industry
-            corp_page = corp_info[2].get('href')
+            corp_page = corp_info[1].get('href')
             stock_info_pe['h1'] = corp_page
         stock_info_pb = self.get_pb_info(code, stock_info_pe)
 
@@ -139,22 +150,25 @@ class ENiu(object):
         stock_url = 'https://eniu.com/gu/%s/pb' % code
         soup = self.urlparser.soup_request(stock_url)
         html = soup.find_all('div', class_='col-xs-12')
+        # print(len(html))
         if len(html) == 0:
             print("No page")
         else:
-            if len(html) == 9:
-                html_pb = html[2]
+            if len(html) == 10:
+                # html_pb = html[2]
+                html_pb = html[6]
             else:
-                html_pb = html[3]
+                # html_pb = html[3]
+                html_pb = html[7]
             soup_pb = self.urlparser.lxml_html(html_pb)
             pb_info = soup_pb.find_all('h3')
-            pb_now = pb_info[2].string
+            pb_now = pb_info[1].string
             stock_info_pb['b4'] = pb_now
-            pb_avg = pb_info[3].string
+            pb_avg = pb_info[2].string
             stock_info_pb['d4'] = pb_avg
-            pb_high = pb_info[4].string
+            pb_high = pb_info[3].string
             stock_info_pb['f4'] = pb_high
-            pb_low = pb_info[5].string
+            pb_low = pb_info[4].string
             stock_info_pb['h4'] = pb_low
             pb_his_avg = []
             pb_his_high = []
@@ -261,5 +275,6 @@ if __name__ == '__main__':
     p = Pool()
     for stock_code in app.iterator_stock_code():
         p.apply_async(app.main, (stock_code,))
+        # app.main(stock_code)
     p.close()
     p.join()
