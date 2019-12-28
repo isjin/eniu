@@ -266,7 +266,8 @@ class ENiu(object):
     def main(self, code):
         print(code)
         data_pe_info, data_pb_info, data_fcf_info, line_number = self.get_pe_info(code)
-        self.excel(data_pe_info, data_pb_info, data_fcf_info, code, line_number)
+        if len(data_pe_info)>0:
+            self.excel(data_pe_info, data_pb_info, data_fcf_info, code, line_number)
 
 
 if __name__ == '__main__':
